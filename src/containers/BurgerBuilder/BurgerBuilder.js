@@ -20,7 +20,23 @@ class BurgerBuilder extends Component {
             cheese: 0,
             meat: 0
         },
-        totalPrice: 4
+        totalPrice: 4,
+        purchaseable: false
+    }
+
+    //method to check whether we should turn purchaseable (in state) to true or keep it false. 
+    updatePurchaseState (ingredients) {
+        console.log(ingredients);
+        //returns an array of strings ['salad', 'bacon', 'cheese','meat']
+        const sum = Object.keys(ingredients)
+            .map(igKey => {
+                return ingredients[igKey];
+            })
+            //this time we want to reduce the array to turn it into a single number (the sum of all the ingredients the user picks)
+            .reduce((sum, el) => {
+                return sum + el;
+            }, 0);
+        this.setState( { purchaseable: sum > 0 } )
     }
 
     //Methods to build whats actually going to be on the burger
@@ -37,6 +53,7 @@ class BurgerBuilder extends Component {
         const newPrice = oldPrice + priceAddition;
         // state update when new ingredient is added
         this.setState({ingredients: updatedIngredients, totalPrice: newPrice});
+        this.updatePurchaseState(updatedIngredients);
     }
 
     removeIngredientHandler = (type) => {
@@ -53,6 +70,7 @@ class BurgerBuilder extends Component {
         const oldPrice = this.state.totalPrice;
         const newPrice = oldPrice - priceDeduction;
         this.setState({ingredients: updatedIngredients, totalPrice: newPrice});
+        this.updatePurchaseState(updatedIngredients);
     }
 
 
@@ -73,7 +91,9 @@ class BurgerBuilder extends Component {
                     <BuildControls 
                     ingredientAdded={this.addIngredientHandler} 
                     ingredientRemoved={this.removeIngredientHandler}
-                    disabled={disabledInfo} />
+                    disabled={disabledInfo} 
+                    purchaseable={this.state.purchaseable}
+                    price={this.state.totalPrice}/>
             </Aux>
         )
     }
